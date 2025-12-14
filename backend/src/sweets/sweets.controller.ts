@@ -1,3 +1,21 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { SweetsService } from './sweets.service';
+import { CreateSweetDto } from './dto/create-sweet.dto';
+import { UpdateSweetDto } from './dto/update-sweet.dto';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+
 @Controller('sweets')
 export class SweetsController {
   constructor(private readonly sweetsService: SweetsService) {}
@@ -8,7 +26,7 @@ export class SweetsController {
     return this.sweetsService.findAll();
   }
 
-  // PUBLIC (must be BEFORE :id)
+  // PUBLIC (keep search BEFORE :id)
   @Get('search')
   search(
     @Query('name') name?: string,
@@ -30,21 +48,21 @@ export class SweetsController {
     return this.sweetsService.findOne(id);
   }
 
-  // PROTECTED
+  // AUTH REQUIRED
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createSweetDto: CreateSweetDto) {
     return this.sweetsService.create(createSweetDto);
   }
 
-  // PROTECTED
+  // AUTH REQUIRED
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateSweetDto: UpdateSweetDto) {
     return this.sweetsService.update(id, updateSweetDto);
   }
 
-  // ADMIN
+  // ADMIN ONLY
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Delete(':id')
@@ -52,6 +70,7 @@ export class SweetsController {
     return this.sweetsService.remove(id);
   }
 }
+
 
 
 
