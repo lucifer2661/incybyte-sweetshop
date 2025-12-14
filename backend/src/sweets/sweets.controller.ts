@@ -17,20 +17,22 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('sweets')
-@UseGuards(JwtAuthGuard)
 export class SweetsController {
   constructor(private readonly sweetsService: SweetsService) {}
 
-  @Post()
-  create(@Body() createSweetDto: CreateSweetDto) {
-    return this.sweetsService.create(createSweetDto);
-  }
-
+  // ✅ PUBLIC: anyone can view sweets (important for frontend)
   @Get()
   findAll() {
     return this.sweetsService.findAll();
   }
 
+  // ✅ PUBLIC: single sweet
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.sweetsService.findOne(id);
+  }
+
+  // ✅ PUBLIC: search sweets
   @Get('search')
   search(
     @Query('name') name?: string,
@@ -46,21 +48,27 @@ export class SweetsController {
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sweetsService.findOne(id);
+  // 🔒 PROTECTED: only logged-in users can create
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  create(@Body() createSweetDto: CreateSweetDto) {
+    return this.sweetsService.create(createSweetDto);
   }
 
+  // 🔒 PROTECTED: only logged-in users can update
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateSweetDto: UpdateSweetDto) {
     return this.sweetsService.update(id, updateSweetDto);
   }
 
-  @Delete(':id')
-  @UseGuards(RolesGuard)
+  // 🔒 ADMIN ONLY: delete sweet
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.sweetsService.remove(id);
   }
 }
+
 
