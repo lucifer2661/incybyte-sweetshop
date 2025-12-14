@@ -27,14 +27,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
+ 
     return Promise.reject(error);
   }
 );
+if (
+  error.response?.status === 401 &&
+  window.location.pathname !== '/login'
+) {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/login';
+}
 
 export interface User {
   id: string;
@@ -113,6 +117,7 @@ export const inventoryApi = {
   purchase: (id: string) => api.post<Sweet>(`/api/inventory/${id}/purchase`),
   restock: (id: string, data: RestockDto) => api.post<Sweet>(`/api/inventory/${id}/restock`, data),
 };
+
 
 
 
