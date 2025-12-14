@@ -110,7 +110,9 @@ export const sweetsApi = {
 
 // Inventory API
 export const inventoryApi = {
-  purchase: (id: string) => api.post<Sweet>(`/api/sweets/${id}/purchase`),
-  restock: (id: string, data: RestockDto) => api.post<Sweet>(`/api/sweets/${id}/restock`, data),
+  purchase: (id: string) => api.post<Sweet>(`/api/inventory/${id}/purchase`),
+  restock: (id: string, data: RestockDto) => api.post<Sweet>(`/api/inventory/${id}/restock`, data),
 };
+
+
 
