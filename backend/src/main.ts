@@ -14,19 +14,25 @@ async function bootstrap() {
   );
 
 app.enableCors({
-  origin: [
-    'http://localhost:5173',
-    'https://incybyte-sweetshop.vercel.app',
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-});
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://incybyte-sweetshop.vercel.app',
+    ];
 
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+});
 
   app.setGlobalPrefix('api');
 
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 
