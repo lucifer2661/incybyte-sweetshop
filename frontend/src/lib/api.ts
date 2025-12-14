@@ -9,7 +9,27 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor to add JWT token
+/* ============================
+   REQUEST INTERCEPTOR
+   - Adds JWT token if present
+============================ */
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+/* ============================
+   RESPONSE INTERCEPTOR
+   - Handles 401 globally
+============================ */
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -21,26 +41,14 @@ api.interceptors.response.use(
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );
 
-// Response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
- 
-    return Promise.reject(error);
-  }
-);
-if (
-  error.response?.status === 401 &&
-  window.location.pathname !== '/login'
-) {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = '/login';
-}
+/* ============================
+   TYPES
+============================ */
 
 export interface User {
   id: string;
@@ -98,27 +106,50 @@ export interface SearchParams {
   maxPrice?: string;
 }
 
-// Auth API
+/* ============================
+   AUTH API
+============================ */
 export const authApi = {
-  register: (data: RegisterDto) => api.post<AuthResponse>('/api/auth/register', data),
-  login: (data: LoginDto) => api.post<AuthResponse>('/api/auth/login', data),
+  register: (data: RegisterDto) =>
+    api.post<AuthResponse>('/api/auth/register', data),
+
+  login: (data: LoginDto) =>
+    api.post<AuthResponse>('/api/auth/login', data),
 };
 
-// Sweets API
+/* ============================
+   SWEETS API
+============================ */
 export const sweetsApi = {
   getAll: () => api.get<Sweet[]>('/api/sweets'),
-  getById: (id: string) => api.get<Sweet>(`/api/sweets/${id}`),
-  create: (data: CreateSweetDto) => api.post<Sweet>('/api/sweets', data),
-  update: (id: string, data: UpdateSweetDto) => api.put<Sweet>(`/api/sweets/${id}`, data),
-  delete: (id: string) => api.delete<Sweet>(`/api/sweets/${id}`),
-  search: (params: SearchParams) => api.get<Sweet[]>('/api/sweets/search', { params }),
+
+  getById: (id: string) =>
+    api.get<Sweet>(`/api/sweets/${id}`),
+
+  create: (data: CreateSweetDto) =>
+    api.post<Sweet>('/api/sweets', data),
+
+  update: (id: string, data: UpdateSweetDto) =>
+    api.put<Sweet>(`/api/sweets/${id}`, data),
+
+  delete: (id: string) =>
+    api.delete(`/api/sweets/${id}`),
+
+  search: (params: SearchParams) =>
+    api.get<Sweet[]>('/api/sweets/search', { params }),
 };
 
-// Inventory API
+/* ============================
+   INVENTORY API
+============================ */
 export const inventoryApi = {
-  purchase: (id: string) => api.post<Sweet>(`/api/inventory/${id}/purchase`),
-  restock: (id: string, data: RestockDto) => api.post<Sweet>(`/api/inventory/${id}/restock`, data),
+  purchase: (id: string) =>
+    api.post<Sweet>(`/api/inventory/${id}/purchase`),
+
+  restock: (id: string, data: RestockDto) =>
+    api.post<Sweet>(`/api/inventory/${id}/restock`, data),
 };
+
 
 
 
