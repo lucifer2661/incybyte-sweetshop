@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Production
+/dist
+
+# Environment
+.env
+.env.local
+
+# Testing
+/coverage
+
+# IDE
+.vscode/
+.idea/

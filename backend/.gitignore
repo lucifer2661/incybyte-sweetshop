@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Testing
+/coverage
+*.log
+
+# Production
+/dist
+
+# Environment
+.env
+.env.local
+
+# Prisma
+prisma/migrations/
+
+# IDE
+.vscode/
+.idea/
